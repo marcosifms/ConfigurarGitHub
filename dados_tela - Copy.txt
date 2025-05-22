@@ -1,0 +1,7 @@
+0
+F:\DriveC_Atual\Documents\NetBeans18Projects\ConfigurarGitHub
+marcos.vilhanueva@ifms.edu.br
+marcos.ifms
+https://github.com/marcosifms/ConfigurarGitHub.git
+
+
