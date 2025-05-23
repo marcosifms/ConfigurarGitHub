@@ -33,7 +33,8 @@ public class JConfigGitHub extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(null);
         setTitle("Configuração básica do git hub");
-        Util.habilitar(false, jCboSistOperacional, jTxtNick, jTxtEmail, jTxtRepositorio);
+        Util.habilitar(false, jCboSistOperacional, jTxtNick, jTxtEmail, jTxtRepositorio,
+                jBtnConfigGit, jBtnLimpar);
 //        System.out.println(OsUtils.getOsName()); 
         if (OsUtils.isWindows()) {
             jCboSistOperacional.setSelectedIndex(0);
@@ -43,10 +44,10 @@ public class JConfigGitHub extends javax.swing.JDialog {
     }
 
     public boolean gitConfigurado(String diretorio) {
-        File file = new File(diretorio);
+        //File file = new File(diretorio);
         String[] cmds1 = {
-            file.getPath().substring(0, 2),
-            "cd " + file.getPath(),
+            diretorio.substring(0, 2),
+            "cd " + diretorio,
             "git status"
         };
         Commands commands = new Commands();
@@ -54,13 +55,24 @@ public class JConfigGitHub extends javax.swing.JDialog {
         return !((String) lista.get(0)).contains("fatal: not a git repository");
     }
 
+    public List gitHistoricoCommit() {
+        String diretorio = jTxtDiretorio.getText();
+        String[] cmds1 = {
+            diretorio.substring(0, 2),
+            "cd " + diretorio,
+            "git log"
+        };
+        Commands commands = new Commands();
+        return commands.processaCmd(cmds1);
+    }
+
     private void salvarDados() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO_DADOS))) {
             writer.write(jCboSistOperacional.getSelectedIndex() + "\n");
             writer.write(jTxtDiretorio.getText() + "\n");
-            writer.write(jTxtEmail.getText() + "\n");
-            writer.write(jTxtNick.getText() + "\n");
-            writer.write(jTxtRepositorio.getText() + "\n");
+//            writer.write(jTxtEmail.getText() + "\n");
+//            writer.write(jTxtNick.getText() + "\n");
+//            writer.write(jTxtRepositorio.getText() + "\n");
 //            writer.write(Base64.getEncoder().encodeToString(jTextArea1.getText().getBytes()) + "\n"); // Evita quebras de linha problemáticas
 //            writer.write(Base64.getEncoder().encodeToString(jTextArea2.getText().getBytes()) + "\n"); // Evita quebras de linha problemáticas
         } catch (IOException e) {
@@ -69,6 +81,22 @@ public class JConfigGitHub extends javax.swing.JDialog {
     }
 
     private void carregarDados() {
+        File file = new File(ARQUIVO_DADOS);
+        if (!file.exists()) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+
+            jCboSistOperacional.setSelectedIndex(Integer.parseInt(reader.readLine()));
+            jTxtDiretorio.setText(reader.readLine());
+
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void carregarUltimaConfiguracao() {
         File file = new File(ARQUIVO_DADOS);
         if (!file.exists()) {
             return;
@@ -111,11 +139,12 @@ public class JConfigGitHub extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jBtnProcessar = new javax.swing.JButton();
+        jBtnVerificar = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jTxtRepositorio = new javax.swing.JTextField();
         jBtnConfigGit = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jBtnLimpar = new javax.swing.JButton();
+        jBtnUltimaConfig = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -160,10 +189,10 @@ public class JConfigGitHub extends javax.swing.JDialog {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        jBtnProcessar.setText("Verificar");
-        jBtnProcessar.addActionListener(new java.awt.event.ActionListener() {
+        jBtnVerificar.setText("Verificar");
+        jBtnVerificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnProcessarActionPerformed(evt);
+                jBtnVerificarActionPerformed(evt);
             }
         });
 
@@ -176,10 +205,17 @@ public class JConfigGitHub extends javax.swing.JDialog {
             }
         });
 
-        jButton1.setText("Limpar Configurações");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jBtnLimpar.setText("Limpar Configurações");
+        jBtnLimpar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jBtnLimparActionPerformed(evt);
+            }
+        });
+
+        jBtnUltimaConfig.setText("Última configuração");
+        jBtnUltimaConfig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnUltimaConfigActionPerformed(evt);
             }
         });
 
@@ -198,7 +234,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jTxtDiretorio, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
+                                .addComponent(jTxtDiretorio, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jBtnArquivoSistec))
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -211,10 +247,15 @@ public class JConfigGitHub extends javax.swing.JDialog {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jBtnConfigGit)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jBtnLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(12, 12, 12)
-                        .addComponent(jBtnProcessar, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(jBtnVerificar, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jBtnUltimaConfig)))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -226,7 +267,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTxtDiretorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBtnArquivoSistec)
-                    .addComponent(jBtnProcessar))
+                    .addComponent(jBtnVerificar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -248,7 +289,8 @@ public class JConfigGitHub extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBtnConfigGit)
-                    .addComponent(jButton1))
+                    .addComponent(jBtnLimpar)
+                    .addComponent(jBtnUltimaConfig))
                 .addContainerGap(64, Short.MAX_VALUE))
         );
 
@@ -375,9 +417,9 @@ public class JConfigGitHub extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jBtnArquivoSistecActionPerformed
 
-    private void jBtnProcessarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnProcessarActionPerformed
+    private void jBtnVerificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnVerificarActionPerformed
         // TODO add your handling code here:        
-        File file = new File(jTxtDiretorio.getText());
+//        File file = new File(jTxtDiretorio.getText());
 //            System.out.println(file.getPath().substring(0, 2));
 
 //        String[] cmds1 = {
@@ -385,39 +427,55 @@ public class JConfigGitHub extends javax.swing.JDialog {
 //            "cd " + file.getPath(),
 //            "git status"
 //        };
-        Commands commands = new Commands();
+        if (jTxtDiretorio.getText().isEmpty()) {
+            Util.mensagem("Um diretório deve ser escolhido para verificação. ");
+        } else {
+            Commands commands = new Commands();
 //        List lista = commands.processaCmd(cmds1);
 //        if (((String) lista.get(0)).contains("fatal: not a git repository")) {
 //            jTextArea1.append((String) lista.get(0));
 
-        jTextArea1.append("Verificação em " + new java.util.Date() + "\n");
-        jTextArea1.append("-----------------------------------------------" + "\n");
-        if (!gitConfigurado(jTxtDiretorio.getText())) {
-            jTextArea1.append("GIT não está configurado.");
-        } else {
-            String[] cmds2 = {
-                file.getPath().substring(0, 2), //muda para o diretorio no windows
-                "cd " + file.getPath(),
-                "git config --list"
-            };
-            List lista = commands.processaCmd(cmds2);
-            for (int i = 0; i < lista.size(); i++) {
-                System.out.println(lista.get(i));
-                if ((((String) lista.get(i)).contains("user."))
-                        || (((String) lista.get(i)).contains("remote."))) {
-                    jTextArea1.append(lista.get(i) + "\n");
-                }
-                if (((String) lista.get(i)).contains("user.name")) {
-                    jTxtNick.setText((String) lista.get(i));
-                }
-                if (((String) lista.get(i)).contains("user.email")) {
-                    jTxtEmail.setText((String) lista.get(i));
+            jTextArea1.append("Verificação em " + new java.util.Date() + "\n");
+            jTextArea1.append("""
+                              -----------------------------------------------
+                              """);
+            if (!gitConfigurado(jTxtDiretorio.getText())) {
+                jTextArea1.append("GIT não está configurado. \n Preencha Nick name, "
+                        + "email e nome do repositorio. Depois clique no botão 'Processar Conf. Git'");
+            } else {
+                String[] cmds2 = {
+                    jTxtDiretorio.getText().substring(0, 2), //muda para o diretorio no windows
+                    "cd " + jTxtDiretorio.getText(),
+                    "git config --list"
+                };
+                List lista = commands.processaCmd(cmds2);
+                for (int i = 0; i < lista.size(); i++) {
+                    System.out.println(lista.get(i));
+                    if ((((String) lista.get(i)).contains("user."))
+                            || (((String) lista.get(i)).contains("remote."))) {
+                        jTextArea1.append(lista.get(i) + "\n");
+                    }
+                    if (((String) lista.get(i)).contains("user.name")) {
+                        String texto = (String) lista.get(i);
+                        texto = texto.substring(texto.indexOf("=") + 1);
+                        jTxtNick.setText(texto);
+                    }
+                    if (((String) lista.get(i)).contains("user.email")) {
+                        String texto = (String) lista.get(i);
+                        texto = texto.substring(texto.indexOf("=") + 1);
+                        jTxtEmail.setText(texto);
+                    }
+                    if (((String) lista.get(i)).contains("remote.origin.url")) {
+                        String texto = (String) lista.get(i);
+                        texto = texto.substring(texto.indexOf("=") + 1);
+                        jTxtRepositorio.setText(texto);
+                    }
                 }
             }
+            Util.habilitar(true, jCboSistOperacional, jTxtNick, jTxtEmail, jTxtRepositorio,
+                    jBtnConfigGit, jBtnLimpar);
         }
-        Util.habilitar(true, jCboSistOperacional, jTxtNick, jTxtEmail, jTxtRepositorio);
-
-    }//GEN-LAST:event_jBtnProcessarActionPerformed
+    }//GEN-LAST:event_jBtnVerificarActionPerformed
 
     private void jBtnCommitLocalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCommitLocalActionPerformed
         // TODO add your handling code here:
@@ -428,10 +486,13 @@ public class JConfigGitHub extends javax.swing.JDialog {
                 "git add *",
                 "git commit -m \"" + jTextArea2.getText() + "\""
             };
+            jTextArea1.append("Commit em " + new java.util.Date() + "\n");
+            jTextArea1.append("-----------------------------------------------" + "\n");
             Commands commands = new Commands();
             List lista = commands.processaCmd(cmds1);
             for (int i = 0; i < lista.size(); i++) {
                 System.out.println(lista.get(i));
+                jTextArea1.append(lista.get(i) + "\n");
             }
         }
 
@@ -445,10 +506,13 @@ public class JConfigGitHub extends javax.swing.JDialog {
             String[] cmds1 = {
                 "git push -u origin main"
             };
+            jTextArea1.append("Push em " + new java.util.Date() + "\n");
+            jTextArea1.append("-----------------------------------------------" + "\n");
             Commands commands = new Commands();
             List lista = commands.processaCmd(cmds1);
             for (int i = 0; i < lista.size(); i++) {
                 System.out.println(lista.get(i));
+                jTextArea1.append(lista.get(i) + "\n");
             }
         }
     }//GEN-LAST:event_jBtnPushActionPerformed
@@ -461,12 +525,15 @@ public class JConfigGitHub extends javax.swing.JDialog {
             String[] cmds1 = {
                 "git add *",
                 "git commit -m \"" + jTextArea2.getText() + "\"",
-                "git push -u origin main                "
+                "git push -u origin main"
             };
+            jTextArea1.append("Commit e Push em " + new java.util.Date() + "\n");
+            jTextArea1.append("-----------------------------------------------" + "\n");
             Commands commands = new Commands();
             List lista = commands.processaCmd(cmds1);
             for (int i = 0; i < lista.size(); i++) {
                 System.out.println(lista.get(i));
+                jTextArea1.append(lista.get(i) + "\n");
             }
         }
     }//GEN-LAST:event_jBtnCommitPushActionPerformed
@@ -496,16 +563,24 @@ public class JConfigGitHub extends javax.swing.JDialog {
         salvarDados(); //rem que ser no evento closing
     }//GEN-LAST:event_formWindowClosing
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jBtnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnLimparActionPerformed
         // TODO add your handling code here:
         Util.limparCampos(jTextArea1, jTxtNick, jTxtEmail, jTxtRepositorio);
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jBtnLimparActionPerformed
 
     private void jBtnHistoricoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnHistoricoActionPerformed
         // TODO add your handling code here:
         //git log
+        JDlgHistorico jDlgHistorico = new JDlgHistorico(null, true);
+        jDlgHistorico.setJConfigGitHub(this);
+        jDlgHistorico.setVisible(true);
     }//GEN-LAST:event_jBtnHistoricoActionPerformed
+
+    private void jBtnUltimaConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnUltimaConfigActionPerformed
+        // TODO add your handling code here:
+        carregarUltimaConfiguracao();
+    }//GEN-LAST:event_jBtnUltimaConfigActionPerformed
 
     /**
      * @param args the command line arguments
@@ -555,9 +630,10 @@ public class JConfigGitHub extends javax.swing.JDialog {
     private javax.swing.JButton jBtnCommitPush;
     private javax.swing.JButton jBtnConfigGit;
     private javax.swing.JButton jBtnHistorico;
-    private javax.swing.JButton jBtnProcessar;
+    private javax.swing.JButton jBtnLimpar;
     private javax.swing.JButton jBtnPush;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jBtnUltimaConfig;
+    private javax.swing.JButton jBtnVerificar;
     private javax.swing.JComboBox<String> jCboSistOperacional;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

@@ -15,7 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;//nao entendi pq tem q importar
+import javax.swing.JTextField;
 
 /**
  *
@@ -31,8 +31,8 @@ public class Util {
 
     public static void limparCampos(JComponent... vetComp) {//metodo estatico pode ser usado sem atribuir a um objeto
         for (int i = 0; i < vetComp.length; i++) {
-            if (vetComp[i] instanceof JTextField) {
-                ((JTextField) vetComp[i]).setText("");                
+            if (vetComp[i] instanceof JTextField jTextField) {
+                jTextField.setText("");                
             } else if (vetComp[i] instanceof JTextArea) {
                 ((JTextArea) vetComp[i]).setText("");                
             } else if (vetComp[i] instanceof JComboBox) {
@@ -49,17 +49,8 @@ public class Util {
 
     public static boolean perguntar(String texto) {
         int resp = JOptionPane.showConfirmDialog(null, texto, "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (resp == JOptionPane.YES_OPTION) {
-            return true;
-        } else {
-            return false;
-        }
+        return resp == JOptionPane.YES_OPTION;
     }
-    //////////////////////////////////////////////////////////////////////////////////___________________////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////|                   |/////////////////////////////////////////////////////////////////////////////////// 
-    /////////////////////////////////////////////////////////////////////////////////|   As conversões   |/////////////////////////////////////////////////////////////////////////////////// 
-    /////////////////////////////////////////////////////////////////////////////////|___________________|/////////////////////////////////////////////////////////////////////////////////// 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static int strInt(String cad) {
         return Integer.parseInt(cad);
