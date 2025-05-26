@@ -32,7 +32,9 @@ public class JConfigGitHub extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(null);
-        setTitle("Configuração básica do git hub");
+        jTabbedPane1.setSelectedIndex(0);
+        jTabbedPane1.setEnabledAt(1,false);
+        setTitle("Configuração básica do git hub. Disciplina de LP 4. Prof. Marcos Pinheiro Vilhanueva");
         Util.habilitar(false, jCboSistOperacional, jTxtNick, jTxtEmail, jTxtRepositorio,
                 jBtnConfigGit, jBtnLimpar);
 //        System.out.println(OsUtils.getOsName()); 
@@ -145,6 +147,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
         jBtnConfigGit = new javax.swing.JButton();
         jBtnLimpar = new javax.swing.JButton();
         jBtnUltimaConfig = new javax.swing.JButton();
+        jBtnClonarRepositorio = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -219,6 +222,13 @@ public class JConfigGitHub extends javax.swing.JDialog {
             }
         });
 
+        jBtnClonarRepositorio.setText("Clonar Repositorio");
+        jBtnClonarRepositorio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnClonarRepositorioActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -247,8 +257,10 @@ public class JConfigGitHub extends javax.swing.JDialog {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jBtnConfigGit)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jBtnLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                        .addComponent(jBtnLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jBtnClonarRepositorio)))
+                                .addGap(0, 181, Short.MAX_VALUE)))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
@@ -290,7 +302,8 @@ public class JConfigGitHub extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBtnConfigGit)
                     .addComponent(jBtnLimpar)
-                    .addComponent(jBtnUltimaConfig))
+                    .addComponent(jBtnUltimaConfig)
+                    .addComponent(jBtnClonarRepositorio))
                 .addContainerGap(64, Short.MAX_VALUE))
         );
 
@@ -374,7 +387,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Commit e Push", jPanel2);
+        jTabbedPane1.addTab("Commit, Push e Histórico", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -474,15 +487,21 @@ public class JConfigGitHub extends javax.swing.JDialog {
             }
             Util.habilitar(true, jCboSistOperacional, jTxtNick, jTxtEmail, jTxtRepositorio,
                     jBtnConfigGit, jBtnLimpar);
+            jTabbedPane1.setEnabledAt(1,true);
         }
     }//GEN-LAST:event_jBtnVerificarActionPerformed
 
     private void jBtnCommitLocalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCommitLocalActionPerformed
         // TODO add your handling code here:
-        if (!gitConfigurado(jTxtDiretorio.getText())) {
+        if (jTextArea2.getText().isEmpty()) {
+            Util.mensagem("Para este comando deve ser preenchido o Texto do commit.");
+            jTextArea2.grabFocus();
+        } else if (!gitConfigurado(jTxtDiretorio.getText())) {
             Util.mensagem("GIT não está configurado para o diretório " + jTxtDiretorio.getText() + ".");
         } else {
             String[] cmds1 = {
+                //                    jTxtDiretorio.getText().substring(0, 2), //muda para o diretorio no windows
+                //                    "cd " + jTxtDiretorio.getText(),
                 "git add *",
                 "git commit -m \"" + jTextArea2.getText() + "\""
             };
@@ -492,7 +511,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
             List lista = commands.processaCmd(cmds1);
             for (int i = 0; i < lista.size(); i++) {
                 System.out.println(lista.get(i));
-                jTextArea1.append(lista.get(i) + "\n");
+                jTextArea3.append(lista.get(i) + "\n");
             }
         }
 
@@ -504,6 +523,8 @@ public class JConfigGitHub extends javax.swing.JDialog {
             Util.mensagem("GIT não está configurado para o diretório " + jTxtDiretorio.getText() + ".");
         } else {
             String[] cmds1 = {
+                //                    jTxtDiretorio.getText().substring(0, 2), //muda para o diretorio no windows
+                //                    "cd " + jTxtDiretorio.getText(),
                 "git push -u origin main"
             };
             jTextArea1.append("Push em " + new java.util.Date() + "\n");
@@ -512,17 +533,22 @@ public class JConfigGitHub extends javax.swing.JDialog {
             List lista = commands.processaCmd(cmds1);
             for (int i = 0; i < lista.size(); i++) {
                 System.out.println(lista.get(i));
-                jTextArea1.append(lista.get(i) + "\n");
+                jTextArea3.append(lista.get(i) + "\n");
             }
         }
     }//GEN-LAST:event_jBtnPushActionPerformed
 
     private void jBtnCommitPushActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCommitPushActionPerformed
         // TODO add your handling code here:
-        if (!gitConfigurado(jTxtDiretorio.getText())) {
+        if (jTextArea2.getText().isEmpty()) {
+            Util.mensagem("Para este comando deve ser preenchido o Texto do commit.");
+            jTextArea2.grabFocus();
+        } else if (!gitConfigurado(jTxtDiretorio.getText())) {
             Util.mensagem("GIT não está configurado para o diretório " + jTxtDiretorio.getText() + ".");
         } else {
             String[] cmds1 = {
+                //                    jTxtDiretorio.getText().substring(0, 2), //muda para o diretorio no windows
+                //                    "cd " + jTxtDiretorio.getText(),
                 "git add *",
                 "git commit -m \"" + jTextArea2.getText() + "\"",
                 "git push -u origin main"
@@ -533,7 +559,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
             List lista = commands.processaCmd(cmds1);
             for (int i = 0; i < lista.size(); i++) {
                 System.out.println(lista.get(i));
-                jTextArea1.append(lista.get(i) + "\n");
+                jTextArea3.append(lista.get(i) + "\n");
             }
         }
     }//GEN-LAST:event_jBtnCommitPushActionPerformed
@@ -541,6 +567,8 @@ public class JConfigGitHub extends javax.swing.JDialog {
     private void jBtnConfigGitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConfigGitActionPerformed
         // TODO add your handling code here:
         String[] cmds1 = {
+            //                    jTxtDiretorio.getText().substring(0, 2), //muda para o diretorio no windows
+            //                    "cd " + jTxtDiretorio.getText(),
             "git init",
             "git config --global user.name  \"" + jTxtNick.getText() + "\"",
             "git config --global user.email \"" + jTxtEmail.getText() + "\"",
@@ -581,6 +609,11 @@ public class JConfigGitHub extends javax.swing.JDialog {
         // TODO add your handling code here:
         carregarUltimaConfiguracao();
     }//GEN-LAST:event_jBtnUltimaConfigActionPerformed
+
+    private void jBtnClonarRepositorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnClonarRepositorioActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_jBtnClonarRepositorioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -626,6 +659,7 @@ public class JConfigGitHub extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnArquivoSistec;
+    private javax.swing.JButton jBtnClonarRepositorio;
     private javax.swing.JButton jBtnCommitLocal;
     private javax.swing.JButton jBtnCommitPush;
     private javax.swing.JButton jBtnConfigGit;
