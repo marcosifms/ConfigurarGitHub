@@ -19,7 +19,9 @@ public class Commands {
     public List processaCmd(String[] cmds) {
         ArrayList lista = new ArrayList();
         try {
+            //"C:\Program Files\Git\git-bash.exe -c" --cd-to-home
             ProcessBuilder builder = new ProcessBuilder("cmd", "/c",
+//            ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\Git\\git-bash.exe", "-c",
                     String.join("& ", cmds));
 
             builder.redirectErrorStream(true);
